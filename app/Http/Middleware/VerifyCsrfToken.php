@@ -15,7 +15,9 @@ class VerifyCsrfToken extends Middleware
         //
     ]; */
     protected $except = [
+        //This is the url that I dont want Csrf for postman.
+      /*   'http://localhost:8080/tttn_be/public/user/register/add',  */
+       
         
-        'http://localhost:8080/tttn_be/public/admin/user/register/store/add' //This is the url that I dont want Csrf for postman.
     ];
 }

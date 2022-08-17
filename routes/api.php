@@ -24,9 +24,28 @@ Bảo mạt api sử dụng json web JWT
     return $request->user();
 }); */
 
-//CATEGORY
-Route::post('category/add', [CategoryController::class, 'add']);
-Route::get('category/list', [CategoryController::class, 'listCategory']);
-Route::get('category/{id}', [CategoryController::class, 'category']);
-Route::post('category/edit/{id}', [CategoryController::class, 'edit']);
-Route::get('category/delete/{id}', [CategoryController::class, 'delete']);
+
+
+//USER
+Route::post('user/register', [UserController::class, 'register']);
+Route::post('user/login', [UserController::class, 'login']);
+Route::post('user/logout', [UserController::class, 'logout']);
+Route::get('user/profile', [UserController::class, 'profile']);
+
+
+Route::middleware(['auth.admin'])->group(function () {
+   //CATEGORY
+    Route::post('category/add', [CategoryController::class, 'add']);
+    Route::get('category/list', [CategoryController::class, 'listCategory']);
+    Route::get('category/{id}', [CategoryController::class, 'category']);
+    Route::post('category/edit/{id}', [CategoryController::class, 'edit']);
+    Route::get('category/delete/{id}', [CategoryController::class, 'delete']);
+
+    //PRODUCT
+    Route::post('product/add', [ProductController::class, 'add']);
+    Route::get('product/list', [ProductController::class, 'listProduct']);
+    Route::get('product/{id}', [ProductController::class, 'product']);
+    Route::post('product/edit/{id}', [ProductController::class, 'edit']);
+    Route::get('product/delete/{id}', [ProductController::class, 'delete']);
+
+});

@@ -15,7 +15,13 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            return route('login');
+           /*  return route('login'); */
+           /* return response()->json([
+            'result'=> false,
+            'message' => 'Bạn chưa đăng nhập!'
+        ]); */
+        return redirect()->to('http://localhost:8080/tttn_be/');
+        
         }
     }
 }

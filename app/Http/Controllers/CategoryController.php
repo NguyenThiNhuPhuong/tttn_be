@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 use App\Models\Category;
@@ -30,10 +31,10 @@ class CategoryController extends Controller
              ]);
              $this->category->name = $request->name;
              $this->category->active = $request->active;
-             /* $this->category->created_by=$this->user->userLogin()->id;
-             $this->category->updated_by=$this->user->userLogin()->id;  */
-             $this->category->created_by=$request->created_by;
-             $this->category->updated_by=$request->updated_by; 
+             $this->category->created_by=Auth::user()->id;
+             $this->category->updated_by=Auth::user()->id; 
+             /* $this->category->created_by=$request->created_by;
+             $this->category->updated_by=$request->updated_by;  */
          
              $this->category->save(); 
              return response()->json([
@@ -75,8 +76,8 @@ class CategoryController extends Controller
              $this->category->find($request->id)->update([
                 'name' => $request->name,
                 'active' => $request->active,
-                /* 'updated_by'=>$this->user->userLogin()->id, */
-                'updated_by'=> $request->updated_by, 
+                'updated_by'=>Auth::user()->id,
+                /* 'updated_by'=> $request->updated_by,  */
             ]);
             return response()->json([
                 'result' => true,
