@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FeedbackController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,9 +33,16 @@ Route::post('user/login', [UserController::class, 'login']);
 Route::post('user/logout', [UserController::class, 'logout']);
 Route::get('user/profile', [UserController::class, 'profile']);
 
+//PRODUCT
+Route::get('product/list', [ProductController::class, 'listProduct']);
+Route::get('product/{id}', [ProductController::class, 'product']);
+
+//FEEDBACK
+Route::post('feedback/add', [FeedbackController::class, 'add']);
+
 
 Route::middleware(['auth.admin'])->group(function () {
-   //CATEGORY
+    //CATEGORY
     Route::post('category/add', [CategoryController::class, 'add']);
     Route::get('category/list', [CategoryController::class, 'listCategory']);
     Route::get('category/{id}', [CategoryController::class, 'category']);
@@ -43,9 +51,6 @@ Route::middleware(['auth.admin'])->group(function () {
 
     //PRODUCT
     Route::post('product/add', [ProductController::class, 'add']);
-    Route::get('product/list', [ProductController::class, 'listProduct']);
-    Route::get('product/{id}', [ProductController::class, 'product']);
     Route::post('product/edit/{id}', [ProductController::class, 'edit']);
     Route::get('product/delete/{id}', [ProductController::class, 'delete']);
-
 });

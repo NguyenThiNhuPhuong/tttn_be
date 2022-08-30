@@ -10,14 +10,14 @@ class Province extends Model
     use HasFactory;
     protected $table = 'province';
     protected $guarded = [];
-    
+
     function getAll()
     {
-       return Province::get();
+        return Province::get();
     }
     function getProvince($id)
     {
-       return Province::find($id);
+        return Province::find($id);
     }
     public function district()
     {

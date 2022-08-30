@@ -13,7 +13,8 @@ class Product extends Model
 
     function getAll()
     {
-        return Product::paginate(16);
+        return Product::get();
+        //return Product::paginate(16);
     }
     function getActive()
     {
@@ -36,7 +37,7 @@ class Product extends Model
     }
     function getAllCategoryID($category_id)
     {
-        return Product::where('category_id', $category_id)->where('active',1)->paginate(16);
+        return Product::where('category_id', $category_id)->where('active', 1)->paginate(16);
     }
     function getAllNumBuy()
     {
@@ -46,11 +47,16 @@ class Product extends Model
     {
         return $this->hasOne("App\Models\Category", 'id', 'category_id');
     }
-    function updateNum($id,$num_buy,$num){
-        Product::where('id',$id)
-        ->update([
-            'num_buy' => $num_buy,
-            'num'=>$num
-        ]);
+    public function productImage()
+    {
+        return $this->hasMany('App\Models\Productimage', 'product_id', 'id');
+    }
+    function updateNum($id, $num_buy, $num)
+    {
+        Product::where('id', $id)
+            ->update([
+                'num_buy' => $num_buy,
+                'num' => $num
+            ]);
     }
 }
