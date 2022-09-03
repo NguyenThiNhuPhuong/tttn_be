@@ -32,19 +32,27 @@ Route::post('user/register', [UserController::class, 'register']);
 Route::post('user/login', [UserController::class, 'login']);
 Route::post('user/logout', [UserController::class, 'logout']);
 Route::get('user/profile', [UserController::class, 'profile']);
+Route::get('user/profile/{id}', [UserController::class, 'profileId']);
+Route::get('user/list', [UserController::class, 'listUser']);
 
 //PRODUCT
 Route::get('product/list', [ProductController::class, 'listProduct']);
 Route::get('product/{id}', [ProductController::class, 'product']);
 
+//CATEGORY
+Route::get('category/list', [CategoryController::class, 'listCategory']);
+
 //FEEDBACK
 Route::post('feedback/add', [FeedbackController::class, 'add']);
 
 
+
+/////////////////////////////////////////////////////////
+
 Route::middleware(['auth.admin'])->group(function () {
     //CATEGORY
     Route::post('category/add', [CategoryController::class, 'add']);
-    Route::get('category/list', [CategoryController::class, 'listCategory']);
+
     Route::get('category/{id}', [CategoryController::class, 'category']);
     Route::post('category/edit/{id}', [CategoryController::class, 'edit']);
     Route::get('category/delete/{id}', [CategoryController::class, 'delete']);

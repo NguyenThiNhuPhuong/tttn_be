@@ -24,74 +24,73 @@ class CategoryController extends Controller
     }
 
     function add(Request $request)
-    { 
-        try{
-             $validated = $request->validate([
-                 'name' => 'required|unique:category',
-             ]);
-             $this->category->name = $request->name;
-             $this->category->active = $request->active;
-             $this->category->created_by=Auth::user()->id;
-             $this->category->updated_by=Auth::user()->id; 
-             /* $this->category->created_by=$request->created_by;
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|unique:category',
+            ]);
+            $this->category->name = $request->name;
+            $this->category->active = $request->active;
+            $this->category->created_by = Auth::user()->id;
+            $this->category->updated_by = Auth::user()->id;
+            /* $this->category->created_by=$request->created_by;
              $this->category->updated_by=$request->updated_by;  */
-         
-             $this->category->save(); 
-             return response()->json([
-                 'result' => true,
-                 'message' => 'Thêm danh mục thành công!',
-                 'data'=> $this->category,
-                 
-            ]); 
-        }catch (Throwable $err){
+
+            $this->category->save();
+            return response()->json([
+                'result' => true,
+                'message' => 'Thêm danh mục thành công!',
+                'category' => $this->category,
+
+            ]);
+        } catch (Throwable $err) {
             return response()->json([
                 'result' => false,
                 'message' => 'Thêm danh mục lỗi!',
-                'error'=>  $err->getMessage(),
+                'error' =>  $err->getMessage(),
             ]);
-           
         }
-       
     }
 
-    function listCategory(){
-       
+    function listCategory()
+    {
+
         return response()->json([
             'result' => true,
-            'data'=> $this->category->getAll(),
-    ]);
-       
+            'category' => $this->category->getAll(),
+        ]);
     }
 
-    function category($id){
-       
+    function category($id)
+    {
+
         return response()->json([
             'result' => true,
-            'data'=> $this->category->getCategory($id),
-    ]);
+            'data' => $this->category->getCategory($id),
+        ]);
     }
 
     function edit(Request $request)
-    {   try{
-             $this->category->find($request->id)->update([
+    {
+        try {
+            $this->category->find($request->id)->update([
                 'name' => $request->name,
                 'active' => $request->active,
-                'updated_by'=>Auth::user()->id,
+                'updated_by' => Auth::user()->id,
                 /* 'updated_by'=> $request->updated_by,  */
             ]);
             return response()->json([
                 'result' => true,
                 'message' => 'Cập nhật danh mục thành công!',
-                'data'=>  $this->category->getCategory($request->id)
-                
+                'category' =>  $this->category->getCategory($request->id)
+
             ]);
-        }catch (Throwable $err){
+        } catch (Throwable $err) {
             return response()->json([
                 'result' => false,
                 'message' => 'Cập nhật danh mục không thành công!',
-                'error'=>  $err->getMessage(),
+                'error' =>  $err->getMessage(),
             ]);
-           
         }
     }
 
@@ -102,18 +101,18 @@ class CategoryController extends Controller
             $result = $this->category->deletes($request->id);
             if ($result) {
                 return response()->json([
-                    'result'=> true,
+                    'result' => true,
                     'message' => 'Xóa danh mục thành công!'
                 ]);
             } else {
                 return response()->json([
-                    'result'=> false,
+                    'result' => false,
                     'message' => 'Xóa danh mục bị lỗi, vui lòng thử lại!'
                 ]);
             }
         } else {
             return response()->json([
-                'result'=> false,
+                'result' => false,
                 'message' => 'Danh mục đang chứa sản phẩm, không thể xóa!'
             ]);
         }

@@ -79,6 +79,22 @@ class UserController extends Controller
             ]);
         }
     }
+
+    function listUser()
+    {
+        return response()->json([
+            'result' => true,
+            'listUser' => $this->user->getAll(),
+        ]);
+    }
+    function profileId($id)
+    {
+
+        return response()->json([
+            'result' => true,
+            'user' => $this->user->getUser($id),
+        ]);
+    }
     function profile()
     {
         try {
