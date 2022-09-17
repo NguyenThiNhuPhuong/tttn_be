@@ -15,11 +15,16 @@ class Feedback extends Model
 
     function getAll()
     {
-        return Feedback::paginate(16);
+       // return Feedback::paginate(16);
+       return  Feedback::get();
     }
     function getFeedback($id)
     {
         return Feedback::find($id);
     }
+    function deletes($id)
+   {
+      return Feedback::where('id', $id)->delete();
+   }
    
 }

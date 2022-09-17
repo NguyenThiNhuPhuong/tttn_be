@@ -54,19 +54,32 @@ class CategoryController extends Controller
 
     function listCategory()
     {
-
+        $categorys =$this->category->getAll()->toArray();
+            $newCategory = array_map(function ($val) {
+                $created_by_text = $this->user->getUser($val['created_by'])['name'];
+                $updated_by_text = $this->user->getUser($val['updated_by'])['name'];
+                $val['created_by_text'] = $created_by_text;
+                $val['updated_by_text'] = $updated_by_text;
+                return $val;
+            }, $categorys );
+            return response()->json([
+                'result' => true,
+                'category' => $newCategory,
+            ]);
+    }
+    function listCategoryActive()
+    {
         return response()->json([
             'result' => true,
-            'category' => $this->category->getAll(),
+            'category' => $this->category->getActive(),
         ]);
     }
-
     function category($id)
     {
 
         return response()->json([
             'result' => true,
-            'data' => $this->category->getCategory($id),
+            'category' => $this->category->getCategory($id),
         ]);
     }
 
@@ -77,7 +90,6 @@ class CategoryController extends Controller
                 'name' => $request->name,
                 'active' => $request->active,
                 'updated_by' => Auth::user()->id,
-                /* 'updated_by'=> $request->updated_by,  */
             ]);
             return response()->json([
                 'result' => true,
@@ -102,7 +114,7 @@ class CategoryController extends Controller
             if ($result) {
                 return response()->json([
                     'result' => true,
-                    'message' => 'Xóa danh mục thành công!'
+                    'message' => 'Xóa danh mục thành công!',
                 ]);
             } else {
                 return response()->json([

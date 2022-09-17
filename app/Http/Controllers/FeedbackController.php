@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Feedback;
+use Throwable;
 
 class FeedbackController extends Controller
 {
@@ -26,10 +27,6 @@ class FeedbackController extends Controller
             $this->feedback->email = $request->email;
             $this->feedback->content = $request->content;
             $this->feedback->user_id = Auth::user()->id;
-
-            /*  $this->feedback->user_id=$request->user_id; */
-
-
             $this->feedback->save();
             return response()->json([
                 'result' => true,
@@ -62,5 +59,21 @@ class FeedbackController extends Controller
             'result' => true,
             'feedback' => $this->feedback->getFeedback($id),
         ]);
+    }
+    function delete($id)
+    {
+
+        $result = $this->feedback->deletes($id);
+        if ($result) {
+            return response()->json([
+                'result' => true,
+                'message' => "Xóa phản hồi thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'result' => false,
+                'message' => "Xóa phản hồi bị lỗi, vui lòng thử lại!"
+            ]);
+        }
     }
 }

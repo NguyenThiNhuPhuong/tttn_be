@@ -13,7 +13,8 @@ class Order extends Model
 
     function getAll()
     {
-        return  Order::orderBy('id', 'DESC')->paginate(16);
+        //return  Order::orderBy('id', 'DESC')->paginate(16);
+        return  Order::orderBy('id', 'DESC')->get();
     }
     function getOrderId($id)
     {

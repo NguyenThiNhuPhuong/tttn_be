@@ -9,11 +9,16 @@ use Throwable;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Productimage;
+use App\Models\Orderdetail;
+
 use Psy\Readline\Hoa\Console;
 
 class ProductController extends Controller
 {
     protected $product;
+    protected $productimage;
+    protected $orderdetail;
     protected $category;
     protected $user;
 
@@ -21,7 +26,10 @@ class ProductController extends Controller
     {
         $this->category = new Category();
         $this->product = new Product();
+        $this->productimage = new Productimage();
         $this->user = new User;
+        $this->orderdetail = new Orderdetail;
+        
     }
 
     function add(Request $request)
@@ -34,6 +42,7 @@ class ProductController extends Controller
                 'content' => 'required',
                 'num' => 'required',
                 'image' => 'required',
+                'listimage' => 'required',
             ]);
             $this->product->name = $request->name;
             $this->product->category_id = $request->category_id;
@@ -43,16 +52,24 @@ class ProductController extends Controller
             $this->product->num = $request->num;
             $this->product->active = $request->active;
             $this->product->image = $request->image;
-            /*  $this->product->created_by=$request->created_by;
-            $this->product->updated_by=$request->updated_by; */
             $this->product->created_by = Auth::user()->id;
             $this->product->updated_by = Auth::user()->id;
             $this->product->save();
+            $product_id =$this->product->id;
 
+            //add product_image 
+
+            foreach ($request->listimage as $val) {
+                $this->productimage->create([
+
+                    'product_id' => $product_id,
+                    'image' =>  $val
+                   ]);
+            }
             return response()->json([
                 'result' => true,
                 'message' => 'Thêm sản phẩm thành công!',
-                'product' => $this->product,
+               
             ]);
         } catch (Throwable $err) {
             return response()->json([
@@ -73,6 +90,7 @@ class ProductController extends Controller
                 'content' => 'required',
                 'num' => 'required',
                 'image' => 'required',
+                'listimage' => 'required',
             ]);
             $this->product->find($request->id)->update([
                 'name' => $request->name,
@@ -83,13 +101,18 @@ class ProductController extends Controller
                 'num' => $request->num,
                 'active' => $request->active,
                 'image' => $request->image,
-                /* 'updated_by'=>$request->updated_by, */
                 'updated_by' => Auth::user()->id,
             ]);
+            //update product_image 
+
+            foreach ($request->listimage as $val) {
+                $this->productimage->find($val['id'])->update([
+                    'image' =>  $val['image'],
+                   ]);
+            }
             return response()->json([
                 'result' => true,
                 'message' => 'Cập nhật sản phẩm thành công!',
-                'data' => $this->product->find($request->id),
             ]);
         } catch (Throwable $err) {
             return response()->json([
@@ -100,12 +123,72 @@ class ProductController extends Controller
         }
     }
 
-    function listProduct()
+    function listProduct(Request $request)
+    {
+        if ($request->id != 'list') {
+            return response()->json([
+                'result' => true,
+                'products' => $this->category->getCategory($request->id)->product,
+            ]);
+        } else {
+            $products = $this->product->getAll()->toArray();
+            $newProducts = array_map(function ($val) {
+                $created_by_text = $this->user->getUser($val['created_by'])['name'];
+                $updated_by_text = $this->user->getUser($val['updated_by'])['name'];
+                $category_id_text = $this->category->getCategory($val['category_id'])['name'];
+                $val['created_by_text'] = $created_by_text;
+                $val['updated_by_text'] = $updated_by_text;
+                $val['category_id_text'] = $category_id_text;
+                return $val;
+            }, $products );
+            return response()->json([
+                'result' => true,
+                'products' => $newProducts,
+            ]);
+        }
+    }
+    function getSearchs(Request $request)
     {
         return response()->json([
             'result' => true,
-            'products' => $this->product->getAll()
+            'products' => $this->product->getSearch($request->search),
         ]);
+    }
+    
+    function listProductAll(Request $request)
+    {
+        if($request->search!=""){
+            return response()->json([
+                'result' => true,
+                'products' => $this->product->getSearch($request->search),
+            ]);
+        }else{
+        if ($request->id != 'list') {
+            return response()->json([
+                'result' => true,
+                'products' => $this->category->getCategory($request->id)->product,
+            ]);
+        } else {
+            $products = $this->product->getAll()->toArray();
+            $newProducts = array_map(function ($val) {
+                $created_by_text = $this->user->getUser($val['created_by'])['name'];
+                $updated_by_text = $this->user->getUser($val['updated_by'])['name'];
+                $category_id_text = $this->category->getCategory($val['category_id'])['name'];
+                $val['created_by_text'] = $created_by_text;
+                $val['updated_by_text'] = $updated_by_text;
+                $val['category_id_text'] = $category_id_text;
+                return $val;
+            }, $products );
+            return response()->json([
+                'result' => true,
+                'products' => $newProducts,
+            ]);
+        }
+        return response()->json([
+            'result' => true,
+            'products' => $this->product->getSearch($request->search),
+        ]);
+    }
     }
 
     function product(Request $request)
@@ -113,23 +196,34 @@ class ProductController extends Controller
         return response()->json([
             'result' => true,
             'product' => $this->product->getProduct($request->id),
-            'product_images' => $this->product->getProduct($request->id)->productImage
+            /* 'product_images' => $this->product->getProduct($request->id)->productImage */
+            'product_images' => $this->productimage->getProductimage($request->id)
         ]);
     }
 
-    function delete(Request $request)
+    function delete($id)
     {
-        $id = $request->id;
-        $result = $this->product->deletes($id);
-        if ($result) {
-            return response()->json([
-                'result' => true,
-                'message' => "Xóa sản phẩm thành công!"
-            ]);
+        $temp = $this->orderdetail->getAllProductID($id);
+        if (count($temp) == 0) {
+            $this->productimage->deleteProductId($id);
+            $result = $this->product->deletes($id);
+            if ($result) {
+                return response()->json([
+                    'result' => true,
+                    'message' => "Xóa sản phẩm thành công!"
+                ]);
+            } else {
+                return response()->json([
+                    'result' => false,
+                    'message' => "Xóa sản phẩm bị lỗi, vui lòng thử lại!"
+                ]);
+            }
+         
+         
         } else {
             return response()->json([
                 'result' => false,
-                'message' => "Xóa sản phẩm bị lỗi, vui lòng thử lại!"
+                'message' => 'Sản phẩm đang có đơn hàng, không thể xóa!'
             ]);
         }
     }

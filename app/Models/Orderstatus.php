@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Orderstatus extends Model
 {
     use HasFactory;
-    protected $table = "orderstatus";
+    protected $table = "order_status";
     protected $guarded = [];
 
     function getAll()

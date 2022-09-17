@@ -13,7 +13,6 @@ class UserController extends Controller
 
     function __construct()
     {
-        //$this->middleware('auth:api', ['except' => ['login']]);
         $this->user = new User;
     }
 
@@ -23,6 +22,43 @@ class UserController extends Controller
             $validated = $request->validate([
                 'name' => 'required',
                 'email' => 'required|email|unique:users',
+                'address'=> 'required',
+                'phone'=> 'required',
+                'password' => 'required|min:6',
+                'password_confirm' => 'required|same:password',
+            ]);
+
+            $this->user->name = $request->name;
+            $this->user->email = $request->email;
+            $this->user->type_id = $request->type_id;
+            $this->user->password = bcrypt($request->password);
+            $this->user->phone = $request->phone;
+            $this->user->avatar = 'https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-PNG-Picture.png';
+            $this->user->address = $request->address;
+            $this->user->save();
+
+            return response()->json([
+                'result' => true,
+                'message' => 'Đăng ký tài khoản thành công!',
+                'user' => $this->user,
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Đăng ký tài khoản không thành công, Vui lòng thử lại!',
+                'error' =>  $err->getMessage(),
+            ]);
+        }
+    }
+    function registerAdmin(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required',
+                'email' => 'required|email|unique:users',
+                'address'=> 'required',
+                'avatar'=> 'required',
+                'phone'=> 'required',
                 'password' => 'required|min:6',
                 'password_confirm' => 'required|same:password',
             ]);
@@ -32,18 +68,21 @@ class UserController extends Controller
             $this->user->type_id = $request->type_id;
             $this->user->password = bcrypt($request->password);
             $this->user->created_by = $request->created_by;
-            $this->user->updated_by = $request->updated_by;
+            $this->user->phone = $request->phone;
+            $this->user->avatar = $request->avatar;
+            $this->user->address = $request->address;
+            $this->user->created_by = Auth::user()->id;
             $this->user->save();
 
             return response()->json([
                 'result' => true,
                 'message' => 'Đăng ký tài khoản thành công!',
-                'data' => $this->user,
+                'user' => $this->user,
             ]);
         } catch (Throwable $err) {
             return response()->json([
                 'result' => false,
-                'message' => 'Tài khoản đã tồn tại, Vui lòng thử lại!',
+                'message' => 'Đăng ký tài khoản không thành công, Vui lòng thử lại!',
                 'error' =>  $err->getMessage(),
             ]);
         }
@@ -56,7 +95,7 @@ class UserController extends Controller
                 'email' => 'required|email:filter',
                 'password' => 'required|min:6',
             ]);
-            if ($token = Auth::attempt(['email' => $request->email, 'password' => $request->password],)) {
+            if ($token = Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 /* $this->respondWithToken($token); */
                 return response()->json([
                     'result' => true,
@@ -98,10 +137,17 @@ class UserController extends Controller
     function profile()
     {
         try {
-            return response()->json([
-                'result' => true,
-                'user' => Auth::user(),
-            ]);
+           if(Auth::user()!=null){ 
+                return response()->json([
+                    'result' => true,
+                    'user' => Auth::user(),
+                ]);
+            }else{
+                return response()->json([
+                    'result' => false,
+                    'user' => Auth::user(),
+                ]);
+            }
         } catch (Throwable $err) {
 
             return response()->json([
@@ -119,7 +165,6 @@ class UserController extends Controller
                 'message' => 'Đăng xuất thành công!',
             ]);
         } catch (Throwable $err) {
-
             return response()->json([
                 'result' => false,
                 'error' =>  $err->getMessage(),
@@ -135,5 +180,38 @@ class UserController extends Controller
             'expires_in' => Auth::factory()->getTTL() * 60,
             'user' => Auth::user(),
         ]);
+    }
+    function edit(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required',
+                'address' => 'required',
+                'phone' => 'required',
+                'avatar'=>'required',
+            ]);
+
+          $result= $this->user->find($request->id)->update([
+            'name' => $request->name,
+                'phone' => $request->phone,
+               'address' => $request->address,
+                'avatar' => $request->avatar,
+                'type_id'=> $request->type_id,
+                'updated_by' => Auth::user()->id,
+            ]);
+           
+                return response()->json([
+                    'result' => $result,
+                    'message' => 'Cập nhật thông tin thành công!',
+                ]);
+           
+           
+        } catch (Throwable $err) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Cập nhật thông tin không thành công!',
+                'error' =>  $err->getMessage(),
+            ]);
+        }
     }
 }
