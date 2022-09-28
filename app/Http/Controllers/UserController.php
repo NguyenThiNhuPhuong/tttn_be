@@ -50,6 +50,7 @@ class UserController extends Controller
             ]);
         }
     }
+
     function registerAdmin(Request $request)
     {
         try {
@@ -137,7 +138,7 @@ class UserController extends Controller
     function profile()
     {
         try {
-           if(Auth::user()!=null){ 
+           if(Auth::user()!=null){
                 return response()->json([
                     'result' => true,
                     'user' => Auth::user(),
@@ -199,13 +200,13 @@ class UserController extends Controller
                 'type_id'=> $request->type_id,
                 'updated_by' => Auth::user()->id,
             ]);
-           
+
                 return response()->json([
                     'result' => $result,
                     'message' => 'Cập nhật thông tin thành công!',
                 ]);
-           
-           
+
+
         } catch (Throwable $err) {
             return response()->json([
                 'result' => false,

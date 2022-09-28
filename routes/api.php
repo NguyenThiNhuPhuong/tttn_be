@@ -39,7 +39,7 @@ Route::middleware(['auth.admin'])->group(function () {
     //USER
     Route::post('user/registeradmin', [UserController::class, 'registerAdmin']);
     Route::get('user/list', [UserController::class, 'listUser']);
-   
+
 
     //CATEGORY
     Route::post('category/add', [CategoryController::class, 'add']);
@@ -86,6 +86,7 @@ Route::get('product/list/{id}', [ProductController::class, 'listProduct']);
 Route::get('product/{id}', [ProductController::class, 'product']);
 Route::get('product/listsearch/{search}', [ProductController::class, 'getSearchs']);
 Route::get('product/listproduct/{id}', [ProductController::class, 'listProductAll']);
+
 //SLIDER
 Route::get('slider/list', [SliderController::class, 'listSlider']);
 Route::get('slider/{id}', [SliderController::class, 'slider']);
